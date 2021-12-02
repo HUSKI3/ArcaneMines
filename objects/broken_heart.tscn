@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://tiles.png" type="Texture" id=1]
+[ext_resource path="res://assets/gfx/tiles.png" type="Texture" id=1]
 
 [node name="Node2D" type="Node2D"]
 
@@ -8,4 +8,4 @@
 position = Vector2( 4, 4 )
 texture = ExtResource( 1 )
 region_enabled = true
-region_rect = Rect2( 80, 88, 8, 8 )
+region_rect = Rect2( 49, 44, 5, 4 )

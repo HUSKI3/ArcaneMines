@@ -1,13 +1,13 @@
 [gd_scene load_steps=18 format=2]
 
-[ext_resource path="res://tiles.png" type="Texture" id=1]
-[ext_resource path="res://Player.gd" type="Script" id=2]
-[ext_resource path="res://main.tres" type="TileSet" id=3]
-[ext_resource path="res://TileMap.gd" type="Script" id=4]
-[ext_resource path="res://theme.tres" type="Theme" id=5]
-[ext_resource path="res://TerminusTTF-4.49.1.ttf" type="DynamicFontData" id=6]
-[ext_resource path="res://game.gd" type="Script" id=7]
-[ext_resource path="res://light.png" type="Texture" id=8]
+[ext_resource path="res://assets/prefabs/theme.tres" type="Theme" id=1]
+[ext_resource path="res://scripts/main/game.gd" type="Script" id=2]
+[ext_resource path="res://scripts/main/TileMap.gd" type="Script" id=3]
+[ext_resource path="res://scripts/main/Player.gd" type="Script" id=4]
+[ext_resource path="res://assets/gfx/tiles.png" type="Texture" id=5]
+[ext_resource path="res://assets/fonts/TerminusTTF-4.49.1.ttf" type="DynamicFontData" id=6]
+[ext_resource path="res://assets/prefabs/main.tres" type="TileSet" id=7]
+[ext_resource path="res://assets/gfx/light.png" type="Texture" id=8]
 
 [sub_resource type="Shader" id=7]
 code = "shader_type spatial;
@@ -106,7 +106,7 @@ use_mipmaps = true
 font_data = ExtResource( 6 )
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 7.5, 8 )
+extents = Vector2( 5, 2 )
 
 [sub_resource type="ParticlesMaterial" id=5]
 emission_shape = 1
@@ -211,7 +211,7 @@ shader_param/scale = 2.0
 
 [node name="Node2D" type="Node2D"]
 position = Vector2( -1, 0 )
-script = ExtResource( 7 )
+script = ExtResource( 2 )
 uuid = 1
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
@@ -222,7 +222,7 @@ color = Color( 0, 0, 0, 1 )
 [node name="Player" type="KinematicBody2D" parent="."]
 position = Vector2( 185, 109 )
 z_index = 2
-script = ExtResource( 2 )
+script = ExtResource( 4 )
 
 [node name="c" type="CanvasLayer" parent="Player"]
 
@@ -270,7 +270,7 @@ margin_right = 131.0
 margin_bottom = 195.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource( 5 )
+theme = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -303,7 +303,7 @@ margin_right = 405.0
 margin_bottom = 50.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource( 5 )
+theme = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -353,7 +353,7 @@ __meta__ = {
 
 [node name="TileMap" type="TileMap" parent="Player/c/UI"]
 position = Vector2( 8, 5 )
-tile_set = ExtResource( 3 )
+tile_set = ExtResource( 7 )
 cell_size = Vector2( 16, 17 )
 occluder_light_mask = 0
 format = 1
@@ -364,13 +364,13 @@ position = Vector2( -9, -7 )
 current = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
-position = Vector2( -7.50003, -8 )
+position = Vector2( -8, -2 )
 shape = SubResource( 1 )
 
 [node name="p" type="Sprite" parent="Player"]
 position = Vector2( -8.00001, -8.5 )
 scale = Vector2( 1.2, 1.13333 )
-texture = ExtResource( 1 )
+texture = ExtResource( 5 )
 hframes = 4
 region_enabled = true
 region_rect = Rect2( -0.183929, 87.783, 63.293, 15.4518 )
@@ -401,15 +401,15 @@ script = SubResource( 3 )
 
 [node name="layer0" type="TileMap" parent="ground"]
 material = SubResource( 10 )
-tile_set = ExtResource( 3 )
+tile_set = ExtResource( 7 )
 cell_size = Vector2( 16, 16 )
 collision_use_kinematic = true
 format = 1
-script = ExtResource( 4 )
+script = ExtResource( 3 )
 
 [node name="layer1" type="TileMap" parent="ground"]
 z_index = 1
-tile_set = ExtResource( 3 )
+tile_set = ExtResource( 7 )
 cell_size = Vector2( 16, 16 )
 collision_use_kinematic = true
 format = 1
