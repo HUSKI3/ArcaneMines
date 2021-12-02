@@ -16,6 +16,7 @@ onready var hurt  = get_node("/root/Node2D/Player/pain")
 onready var died_text  = get_node("/root/Node2D/Player/c/died_text")
 
 signal moved
+signal died
 
 # Effects
 var cur_effects = {
@@ -54,8 +55,10 @@ func _physics_process(delta):
 		_upd_console('cum')
 	
 	# Proc movement here
-	move_and_collide(input_vector, FRICTION*delta)
-	emit_signal("moved", global_position)
+	if health > 0:
+		move_and_collide(input_vector, FRICTION*delta)
+		emit_signal("moved", global_position)
+		
 	
 	# Check collision
 	var cell = layer1.world_to_map(global_position)
@@ -81,7 +84,7 @@ func _process(delta):
 	var v = Vector2.ZERO
 	v.x = 1
 	v.y = 1
-	if health > 5:
+	if health > 0:
 		h.set_position(v)
 	else:
 		h.hide()
@@ -90,6 +93,8 @@ func _process(delta):
 			add_child(bh)
 		_upd_console(">Died")
 		died_text.show()
+		emit_signal("died")
+		
 	
 	# Proc the current effects here
 	for e in cur_effects:

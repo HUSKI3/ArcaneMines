@@ -212,7 +212,7 @@ shader_param/scale = 2.0
 [node name="Node2D" type="Node2D"]
 position = Vector2( -1, 0 )
 script = ExtResource( 7 )
-uuid = 102
+uuid = 1
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 material = SubResource( 8 )
@@ -365,7 +365,6 @@ current = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
 position = Vector2( -7.50003, -8 )
-scale = Vector2( 1, 1 )
 shape = SubResource( 1 )
 
 [node name="p" type="Sprite" parent="Player"]

@@ -21,7 +21,7 @@ var players = []
 var players_obj = {}
 
 # The URL we will connect to
-export var websocket_url = "wss://arcanemines-server.huski3.repl.co"
+export var websocket_url = "ws://nexo.fun:8080"
 var _client = WebSocketClient.new()
 
 
@@ -53,6 +53,7 @@ func _ready():
 	
 	# Signals
 	get_node("Player").connect("moved", self, "_send_movement")
+	get_node("Player").connect("died", self, "_died")
 	
 		
 func _upd_console(arg):
@@ -67,6 +68,10 @@ func _upd_console(arg):
 		console.text += '\n' + str(arg)
 		
 	
+func _died():
+	var pl = '{"call":"player.died", "uuid":%s}' % uuid
+	_client.get_peer(1).put_packet(pl.to_utf8())
+
 # Called when the HTTP request is completed.
 func _load_map(body):
 	var response = body
@@ -111,7 +116,7 @@ func _on_data():
 		_load_map(data.body)
 		
 	elif data.type == 'world.join':
-		print('Server says, player joined at uuid',data.player)
+		print('Server says, player joined at uuid ',data.player)
 		if data.player == uuid:
 			print('Thats us...')
 		elif !(data.player in players) && data.player != uuid:
@@ -142,7 +147,7 @@ func _on_data():
 				players_source.add_child(p)
 			_proc_players()
 
-func _proc_players(remove=false):
+func _proc_players(remove=false):	
 	var o = players
 	plist.text = ''
 	for line in o:
