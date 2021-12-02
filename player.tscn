@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://tiles.png" type="Texture" id=1]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 7.5, 8 )
+
+[node name="Node2D" type="Node2D"]
+
+[node name="player_i" type="KinematicBody2D" parent="."]
+
+[node name="pixel" type="Sprite" parent="player_i"]
+position = Vector2( -8.00001, -8.5 )
+scale = Vector2( 1.2, 1.13333 )
+texture = ExtResource( 1 )
+hframes = 4
+region_enabled = true
+region_rect = Rect2( -0.183929, 87.783, 63.293, 15.4518 )
+
+[node name="collider" type="CollisionShape2D" parent="player_i"]
+position = Vector2( -7.50003, -8 )
+scale = Vector2( 1, 1 )
+shape = SubResource( 1 )

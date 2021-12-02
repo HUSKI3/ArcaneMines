@@ -1,0 +1,418 @@
+[gd_scene load_steps=18 format=2]
+
+[ext_resource path="res://tiles.png" type="Texture" id=1]
+[ext_resource path="res://Player.gd" type="Script" id=2]
+[ext_resource path="res://main.tres" type="TileSet" id=3]
+[ext_resource path="res://TileMap.gd" type="Script" id=4]
+[ext_resource path="res://theme.tres" type="Theme" id=5]
+[ext_resource path="res://TerminusTTF-4.49.1.ttf" type="DynamicFontData" id=6]
+[ext_resource path="res://game.gd" type="Script" id=7]
+[ext_resource path="res://light.png" type="Texture" id=8]
+
+[sub_resource type="Shader" id=7]
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley;
+
+uniform vec4 color: hint_color = vec4(0.5, 0.4, 0.4, 1.0);
+uniform float shade_tweak: float = 0.5;
+uniform float light_tweak: float = 1.0;
+uniform float sharpness: float = 1.0;
+uniform float scale: float = 2.0;
+
+const mat4 dither = mat4(
+	vec4(0.0, 0.5333333333, 0.1333333333,  0.6666666667),
+	vec4(0.8, 0.2666666667, 0.9333333333,  0.4),
+	vec4(0.2, 0.7333333333, 0.06666666667, 0.6),
+	vec4(1.0, 0.4666666667, 0.8666666667,  0.3333333333)
+);
+
+void fragment() {
+	ALBEDO = COLOR.rgb * color.rgb;
+}
+
+float sample(vec2 coord, float alpha, float shade, float lit) {
+	int x = int(mod(coord.x, 4));
+	int y = int(mod(coord.y, 4));
+	if (y == 0) {
+		if (x == 0 && dither[0][0] >= alpha) {
+			return shade;
+		} else if (x == 1 && dither[0][1] >= alpha) {
+			return shade;
+		} else if (x == 2 && dither[0][2] >= alpha) {
+			return shade;
+		} else if (x == 3 && dither[0][3] >= alpha) {
+			return shade;
+		}
+	} else if (y == 1) {
+		if (x == 0 && dither[1][0] >= alpha) {
+			return shade;
+		} else if (x == 1 && dither[1][1] >= alpha) {
+			return shade;
+		} else if (x == 2 && dither[1][2] >= alpha) {
+			return shade;
+		} else if (x == 3 && dither[1][3] >= alpha) {
+			return shade;
+		}
+	} else if (y == 2) {
+		if (x == 0 && dither[2][0] >= alpha) {
+			return shade;
+		} else if (x == 1 && dither[2][1] >= alpha) {
+			return shade;
+		} else if (x == 2 && dither[2][2] >= alpha) {
+			return shade;
+		} else if (x == 3 && dither[2][3] >= alpha) {
+			return shade;
+		}
+	} else if (y == 3) {
+		if (x == 0 && dither[3][0] >= alpha) {
+			return shade;
+		} else if (x == 1 && dither[3][1] >= alpha) {
+			return shade;
+		} else if (x == 2 && dither[3][2] >= alpha) {
+			return shade;
+		} else if (x == 3 && dither[3][3] >= alpha) {
+			return shade;
+		}
+	}
+	return lit;
+}
+
+void light() {
+	float f = min(ATTENUATION.r, min(ATTENUATION.g, ATTENUATION.b));
+	float a = sample(
+		FRAGCOORD.xy * (1.0 / scale),
+		clamp(dot(NORMAL, LIGHT) + sharpness, 0.0, 1.0 + sharpness) * f,
+		shade_tweak,
+		light_tweak);
+	DIFFUSE_LIGHT += ALBEDO * a;
+}
+"
+
+[sub_resource type="ShaderMaterial" id=8]
+shader = SubResource( 7 )
+shader_param/color = Color( 0.5, 0.4, 0.4, 1 )
+shader_param/shade_tweak = 0.5
+shader_param/light_tweak = 1.0
+shader_param/sharpness = 1.0
+shader_param/scale = 2.0
+
+[sub_resource type="DynamicFont" id=6]
+size = 40
+font_data = ExtResource( 6 )
+
+[sub_resource type="DynamicFont" id=4]
+size = 7
+use_mipmaps = true
+font_data = ExtResource( 6 )
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 7.5, 8 )
+
+[sub_resource type="ParticlesMaterial" id=5]
+emission_shape = 1
+emission_sphere_radius = 5.0
+flag_disable_z = true
+gravity = Vector3( 20, 0, 20 )
+initial_velocity = 10.0
+orbit_velocity = 0.0
+orbit_velocity_random = 0.0
+scale = 2.0
+hue_variation = -0.07
+hue_variation_random = 1.0
+
+[sub_resource type="GDScript" id=3]
+
+[sub_resource type="Shader" id=9]
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley;
+
+uniform vec4 color: hint_color = vec4(0.5, 0.4, 0.4, 1.0);
+uniform float shade_tweak: float = 0.5;
+uniform float light_tweak: float = 1.0;
+uniform float sharpness: float = 1.0;
+uniform float scale: float = 2.0;
+
+const mat4 dither = mat4(
+	vec4(0.0, 0.5333333333, 0.1333333333,  0.6666666667),
+	vec4(0.8, 0.2666666667, 0.9333333333,  0.4),
+	vec4(0.2, 0.7333333333, 0.06666666667, 0.6),
+	vec4(1.0, 0.4666666667, 0.8666666667,  0.3333333333)
+);
+
+void fragment() {
+	ALBEDO = COLOR.rgb * color.rgb;
+}
+
+float sample(vec2 coord, float alpha, float shade, float lit) {
+	int x = int(mod(coord.x, 4));
+	int y = int(mod(coord.y, 4));
+	if (y == 0) {
+		if (x == 0 && dither[0][0] >= alpha) {
+			return shade;
+		} else if (x == 1 && dither[0][1] >= alpha) {
+			return shade;
+		} else if (x == 2 && dither[0][2] >= alpha) {
+			return shade;
+		} else if (x == 3 && dither[0][3] >= alpha) {
+			return shade;
+		}
+	} else if (y == 1) {
+		if (x == 0 && dither[1][0] >= alpha) {
+			return shade;
+		} else if (x == 1 && dither[1][1] >= alpha) {
+			return shade;
+		} else if (x == 2 && dither[1][2] >= alpha) {
+			return shade;
+		} else if (x == 3 && dither[1][3] >= alpha) {
+			return shade;
+		}
+	} else if (y == 2) {
+		if (x == 0 && dither[2][0] >= alpha) {
+			return shade;
+		} else if (x == 1 && dither[2][1] >= alpha) {
+			return shade;
+		} else if (x == 2 && dither[2][2] >= alpha) {
+			return shade;
+		} else if (x == 3 && dither[2][3] >= alpha) {
+			return shade;
+		}
+	} else if (y == 3) {
+		if (x == 0 && dither[3][0] >= alpha) {
+			return shade;
+		} else if (x == 1 && dither[3][1] >= alpha) {
+			return shade;
+		} else if (x == 2 && dither[3][2] >= alpha) {
+			return shade;
+		} else if (x == 3 && dither[3][3] >= alpha) {
+			return shade;
+		}
+	}
+	return lit;
+}
+
+void light() {
+	float f = min(ATTENUATION.r, min(ATTENUATION.g, ATTENUATION.b));
+	float a = sample(
+		FRAGCOORD.xy * (1.0 / scale),
+		clamp(dot(NORMAL, LIGHT) + sharpness, 0.0, 1.0 + sharpness) * f,
+		shade_tweak,
+		light_tweak);
+	DIFFUSE_LIGHT += ALBEDO * a;
+}
+"
+
+[sub_resource type="ShaderMaterial" id=10]
+shader = SubResource( 9 )
+shader_param/color = Color( 0.5, 0.4, 0.4, 1 )
+shader_param/shade_tweak = 0.5
+shader_param/light_tweak = 1.0
+shader_param/sharpness = 1.0
+shader_param/scale = 2.0
+
+[node name="Node2D" type="Node2D"]
+position = Vector2( -1, 0 )
+script = ExtResource( 7 )
+uuid = 102
+
+[node name="CanvasModulate" type="CanvasModulate" parent="."]
+material = SubResource( 8 )
+position = Vector2( 0, -1 )
+color = Color( 0, 0, 0, 1 )
+
+[node name="Player" type="KinematicBody2D" parent="."]
+position = Vector2( 185, 109 )
+z_index = 2
+script = ExtResource( 2 )
+
+[node name="c" type="CanvasLayer" parent="Player"]
+
+[node name="died_text" type="Label" parent="Player/c"]
+margin_left = 118.0
+margin_top = 56.0
+margin_right = 233.0
+margin_bottom = 138.0
+rect_pivot_offset = Vector2( 106, 75 )
+custom_constants/shadow_offset_x = 3
+custom_constants/line_spacing = 0
+custom_constants/shadow_offset_y = 4
+custom_constants/shadow_as_outline = 0
+custom_fonts/font = SubResource( 6 )
+text = "YOU DIED"
+align = 1
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="l" type="Label" parent="Player/c/died_text"]
+margin_left = 1.0
+margin_top = 1.0
+margin_right = 116.0
+margin_bottom = 83.0
+rect_pivot_offset = Vector2( 106, 75 )
+custom_colors/font_color = Color( 0.14902, 0.14902, 0.14902, 1 )
+custom_constants/shadow_offset_x = 3
+custom_constants/line_spacing = 0
+custom_constants/shadow_offset_y = 4
+custom_constants/shadow_as_outline = 0
+custom_fonts/font = SubResource( 6 )
+text = "YOU DIED"
+align = 1
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="m" type="MarginContainer" parent="Player/c"]
+margin_left = 10.0
+margin_top = 155.0
+margin_right = 131.0
+margin_bottom = 195.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="p" type="Panel" parent="Player/c/m"]
+margin_right = 121.0
+margin_bottom = 40.0
+
+[node name="l" type="Label" parent="Player/c/m/p"]
+margin_left = 2.0
+margin_top = 1.0
+margin_right = 117.0
+margin_bottom = 40.0
+rect_pivot_offset = Vector2( 0, -27 )
+custom_constants/shadow_offset_x = 3
+custom_constants/line_spacing = 0
+custom_constants/shadow_offset_y = 4
+custom_constants/shadow_as_outline = 0
+custom_fonts/font = SubResource( 4 )
+text = "console"
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="m2" type="MarginContainer" parent="Player/c"]
+margin_left = 284.0
+margin_top = 10.0
+margin_right = 405.0
+margin_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="p" type="Panel" parent="Player/c/m2"]
+margin_right = 121.0
+margin_bottom = 40.0
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="plc" type="Label" parent="Player/c/m2/p"]
+margin_left = 1.0
+margin_top = 2.0
+margin_right = 122.0
+margin_bottom = 18.0
+rect_pivot_offset = Vector2( -160, 13 )
+custom_constants/shadow_offset_x = 3
+custom_constants/line_spacing = 0
+custom_constants/shadow_offset_y = 4
+custom_constants/shadow_as_outline = 0
+custom_fonts/font = SubResource( 4 )
+text = "players:
+"
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="pl" type="Label" parent="Player/c/m2/p/plc"]
+margin_top = 10.0
+margin_right = 40.0
+margin_bottom = 70.0
+rect_pivot_offset = Vector2( -160, 13 )
+custom_constants/shadow_offset_x = 3
+custom_constants/line_spacing = 0
+custom_constants/shadow_offset_y = 4
+custom_constants/shadow_as_outline = 0
+custom_fonts/font = SubResource( 4 )
+text = "..."
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="UI" type="Node" parent="Player/c"]
+
+[node name="TileMap" type="TileMap" parent="Player/c/UI"]
+position = Vector2( 8, 5 )
+tile_set = ExtResource( 3 )
+cell_size = Vector2( 16, 17 )
+occluder_light_mask = 0
+format = 1
+tile_data = PoolIntArray( 655368, 4, 0, 655369, 4, 0, 655370, 4, 0, 655371, 4, 0, 655372, 4, 0, 655376, 4, 0, 655378, 4, 0 )
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position = Vector2( -9, -7 )
+current = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+position = Vector2( -7.50003, -8 )
+scale = Vector2( 1, 1 )
+shape = SubResource( 1 )
+
+[node name="p" type="Sprite" parent="Player"]
+position = Vector2( -8.00001, -8.5 )
+scale = Vector2( 1.2, 1.13333 )
+texture = ExtResource( 1 )
+hframes = 4
+region_enabled = true
+region_rect = Rect2( -0.183929, 87.783, 63.293, 15.4518 )
+
+[node name="pain" type="Particles2D" parent="Player"]
+modulate = Color( 0.27451, 0.27451, 0.27451, 1 )
+position = Vector2( -3, -8 )
+emitting = false
+amount = 4
+lifetime = 0.7
+one_shot = true
+speed_scale = 3.0
+explosiveness = 0.14
+randomness = 0.98
+visibility_rect = Rect2( 0, 0, 0, 0 )
+process_material = SubResource( 5 )
+
+[node name="Light2D" type="Light2D" parent="Player"]
+position = Vector2( -7, -7 )
+texture = ExtResource( 8 )
+texture_scale = 0.4
+energy = 0.5
+shadow_enabled = true
+shadow_color = Color( 0.0431373, 0.0352941, 0.0352941, 1 )
+
+[node name="ground" type="Node" parent="."]
+script = SubResource( 3 )
+
+[node name="layer0" type="TileMap" parent="ground"]
+material = SubResource( 10 )
+tile_set = ExtResource( 3 )
+cell_size = Vector2( 16, 16 )
+collision_use_kinematic = true
+format = 1
+script = ExtResource( 4 )
+
+[node name="layer1" type="TileMap" parent="ground"]
+z_index = 1
+tile_set = ExtResource( 3 )
+cell_size = Vector2( 16, 16 )
+collision_use_kinematic = true
+format = 1
+
+[node name="players_source" type="Node" parent="."]
