@@ -2,50 +2,24 @@ extends Node
 
 onready var layer0 = get_node("/root/Node2D/ground/layer0")
 onready var layer1 = get_node("/root/Node2D/ground/layer1")
-onready var inventory_ui = get_node("/root/Node2D/Player/c/UI/inv")
 onready var console  = get_node("/root/Node2D/Player/c/m/p/l")
 onready var plist  = get_node("/root/Node2D/Player/c/m2/p/plc/pl")
 onready var players_source  = get_node("/root/Node2D/players_source")
-onready var inv_labels  = get_node("/root/Node2D/Player/c/UI/labels")
-onready var inventory_node  = get_node("/root/Node2D/Player/c/inventory")     
 
 onready var dirt = layer0.tile_set.find_tile_by_name('dirt')
 onready var grass = layer0.tile_set.find_tile_by_name('grass')
 onready var flower = layer0.tile_set.find_tile_by_name('flower')
-onready var down = layer0.tile_set.find_tile_by_name('down')
 onready var tree = layer0.tile_set.find_tile_by_name('tree')
+onready var down = layer0.tile_set.find_tile_by_name('down')
 
-var player_resource = preload("res://objects/player.tscn")
+var player_resource = preload("player.tscn")
 var player_instance = player_resource.duplicate()
-
-const itemImages = [
-  preload("res://assets/gfx/items/sword.png"),
-  preload("res://assets/gfx/block/wood.png")
-];
-
-onready var itemDictionary = {
-  'wood_sword': {
-    "itemName": "Wooden Sword",
-    "itemValue": 0,
-    "itemIcon": itemImages[0],
-    "slotType": Global.SlotType.SLOT_DEFAULT
-  },
-  'wood': {
-  "itemName": "Wood",
-  "itemValue": 0,
-  "itemIcon": itemImages[1], 
-  "slotType": Global.SlotType.SLOT_DEFAULT
-   }
-};
 
 export (int) var uuid
 
 var old_pos
 var players = []
 var players_obj = {}
-var inventory = {
-  items:[]
-}
 
 # The URL we will connect to
 export var websocket_url = "ws://nexo.fun:8080"
@@ -53,21 +27,16 @@ var _client = WebSocketClient.new()
 
 
 onready var tile_types = {
-  'dirt': dirt,
-  'grass': grass,
-  'flower': flower,
-  'down': down,
-  'tree': tree
+  'dirt':dirt,
+  'grass':grass,
+  'flower':flower,
+  'tree':tree,
+  'down':down
 }
-
-onready var items = {
-  'wood': tree
- }
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
   print('/Loaded tile data')
-
   
   # Connect base signals to get notified of connection open, close, and errors.
   _client.connect("connection_closed", self, "_closed")
@@ -87,7 +56,7 @@ func _ready():
   # Signals
   get_node("Player").connect("moved", self, "_send_movement")
   get_node("Player").connect("died", self, "_died")
-  get_node("Player").connect("interact", self, "_interact")
+  get_node("Player").connect("died", self, "_died")
   
     
 func _upd_console(arg):
@@ -166,6 +135,7 @@ func _on_data():
     var v = Vector2.ZERO
     v.x = data.x
     v.y = data.y
+    print(data.x,data.y)
     if data.player != uuid:
       players_obj[data.player].position = v
     
@@ -179,21 +149,6 @@ func _on_data():
         players_obj[x] = p
         players_source.add_child(p)
       _proc_players()
-      
-  elif data.type == 'world.remove_tile':
-    layer1.set_cellv(Vector2(data.x,data.y), -1)
-    
-  elif data.type == 'world.give':
-    # We want to sync the inventory here
-    var pop = '{"call":"player.inventory", "uuid":'+str(uuid)+'}'
-    _client.get_peer(1).put_packet(pop.to_utf8())
-  
-  elif data.type == 'self.inventory':
-    inventory_node.reset()
-    for item in data.inv:
-      print(item)
-      inventory_node._on_AddItemButton_pressed(itemDictionary[str(item)])
-    
 
 func _proc_players(remove=false):	
   var o = players
@@ -217,10 +172,4 @@ func _send_movement(pos):
     var pop = '{"call":"player.moved","x":'+str(pos.x)+', "y":'+str(pos.y)+', "uuid":'+str(uuid)+'}'
     _client.get_peer(1).put_packet(pop.to_utf8())
   old_pos = pos
-  
-func _interact(v,cell):
-  var pop = '{"call":"world.touch_tile","tile":'+str(v)+\
-  ', "uuid":'+str(uuid)+\
-  ', "cell":{ "y":'+str(cell.y)+\
-  ',"x": '+str(cell.x)+'}}'
-  _client.get_peer(1).put_packet(pop.to_utf8())
+
